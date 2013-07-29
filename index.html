@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>WebSocket Demo</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css" rel="stylesheet" media="screen">
+</head>
+<body>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
+
+<div class="jumbotron">
+	<h1>WebSocket Demo</h1>
+	<p>JQuery and Bootstrap page that allows connecting to given WebSocket server. The default server is ws://echo.websocket.org which will return the exact phrase that is sent.</p>
+	<div class="row show-grid">
+		<div class="col-lg-6">
+			<p><textarea class="form-control" rows="12" id="input"></textarea></p>
+			<p><a class="btn btn-primary btn-large disabled" id="send">Send</a></p>
+		</div>
+		<div class="col-lg-6">
+			<p><textarea class="form-control" rows="12" id="output"></textarea></p>
+		</div>
+	</div>
+
+	<p></p><input type="text" class="form-control" id="hostname" placeholder="WebSocket Server Hostname" value="ws://echo.websocket.org/"></p>
+
+	<p>
+		<button class="btn btn-success" type="submit" id="connect">Connect</button>
+		<button class="btn btn-danger disabled" type="submit" id="disconnect">Disconnect</button>
+		<div class="alert alert-info hide" id="info"></div>
+	</p>
+</div>
+
+<script language="javascript" type="text/javascript">
+$("#connect").click(function() {
+	$("#connect").addClass("disabled");
+	websocket = new WebSocket($('input#hostname').val());
+	websocket.onopen = function(event) {
+		$("#info").removeClass("hide");
+		$("#send").removeClass("disabled");
+		$("#disconnect").removeClass("disabled");
+		$("#info").html("Connected")
+	};
+	websocket.onclose = function(event) {
+		$("#send").addClass("disabled");
+		$("#connect").removeClass("disabled");
+		$("#info").html("Disconnected")
+	};
+	websocket.onmessage = function(event) {$("#info").html("Received data: " + event.data);$('textarea#output').val(event.data) };
+	websocket.onerror = function(event) { $("#info").html(event.data) };
+});
+</script>
+
+<script>
+$("#send").click(function(){
+	websocket.send($('textarea#input').val())
+});
+</script>
+
+<script>
+$("#disconnect").click(function(){
+	$("#disconnect").addClass("disabled");
+	websocket.close();
+});
+</script>
+
+</body>
+</html>
